@@ -1,0 +1,72 @@
+mkdir bnb-nft && cd bnb-nft
+npm init -y
+npm i --save-dev hardhat @nomicfoundation/hardhat-toolbox dotenv
+npm i @openzeppelin/contracts
+npx hardhat init
+# choose: "BNB NFT project"
+
+
+#Add keys 
+touch .env
+PRIVATE_KEY=YOUR_PRIVATE_KEY_NO_0x
+
+# Put this inside your key
+BSC_RPC=https://bsc-dataseed.binance.org
+BSC_TESTNET_RPC=https://data-seed-prebsc-1-s1.binance.org:8545
+
+#Edit hardhat.config.js
+
+require("@nomicfoundation/hardhat-toolbox");
+require("dotenv").config();
+
+module.exports = {
+  solidity: "0.8.20",
+  networks: {
+    bsc: {
+      url: process.env.BSC_RPC,
+      accounts: [process.env.PRIVATE_KEY],
+    },
+    bscTestnet: {
+      url: process.env.BSC_TESTNET_RPC,
+      accounts: [process.env.PRIVATE_KEY],
+    },
+  },
+};
+
+# Create the NFT contract 
+
+mkdir -p contracts
+nano contracts/BullBrewNFT.sol
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract BullBrewNFT is ERC721URIStorage, Ownable {
+    uint256 public tokenIdCounter;
+
+    constructor() ERC721("BullBrewNFT", "BREW") Ownable(msg.sender) {}
+
+    function mintTo(address to, string memory tokenURI) external onlyOwner returns (uint256) {
+        uint256 tokenId = ++tokenIdCounter;
+        _safeMint(to, tokenId);
+        _setTokenURI(tokenId, tokenURI);
+        return tokenId;
+    }
+}
+
+#Compile
+
+npx hardhat compile
+
+
+
+
+
+//to be continued
+
+
+
+
